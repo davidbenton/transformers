@@ -291,7 +291,11 @@ class TokenClassificationPipeline(Pipeline):
                         AggregationStrategy.MAX,
                     }:
                         warnings.warn("Tokenizer does not support real words, using fallback heuristic", UserWarning)
-                    is_subword = sentence[start_ind - 1 : start_ind] != " " if start_ind > 0 else False
+
+                    # check for preceding space in full sequence and leading space in decoded token
+                    preceding_character = sentence[start_ind - 1 : start_ind]
+                    start_character = self.tokenizer.convert_tokens_to_string(word)[0]
+                    is_subword = start_ind > 0 and " " not in [preceding_character, start_character]
 
                 if int(input_ids[idx]) == self.tokenizer.unk_token_id:
                     word = word_ref
